@@ -47,6 +47,15 @@ RC InsertStmt::create(Db *db, const InsertSqlNode &inserts, Stmt *&stmt)
     return RC::SCHEMA_FIELD_MISSING;
   }
 
+  // check if values inserted are valid
+  for (int i = 0; i < value_num; i++) {
+    if (values[i].attr_type() == AttrType::UNDEFINED) {
+      const char *field_name = table_meta.field(i)->name();
+      LOG_WARN("invalid value for field `%s`", field_name);
+      return RC::INVALID_ARGUMENT;
+    }
+  }
+
   // everything alright
   stmt = new InsertStmt(table, values, value_num);
   return RC::SUCCESS;
