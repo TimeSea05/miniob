@@ -175,7 +175,22 @@ RC LogicalPlanGenerator::create_plan(FilterStmt *filter_stmt, unique_ptr<Logical
     if (left->value_type() != right->value_type()) {
       auto left_to_right_cost = implicit_cast_cost(left->value_type(), right->value_type());
       auto right_to_left_cost = implicit_cast_cost(right->value_type(), left->value_type());
-      if (left_to_right_cost <= right_to_left_cost && left_to_right_cost != INT32_MAX) {
+      if (left->type() == ExprType::VALUE && right->type() == ExprType::VALUE) {
+        auto left_cast_expr = make_unique<CastExpr>(std::move(left), AttrType::FLOATS);
+        auto right_cast_expr = make_unique<CastExpr>(std::move(right), AttrType::FLOATS);
+        Value left_val, right_val;
+        if (OB_FAIL(rc = left_cast_expr->try_get_value(left_val))) {
+            LOG_WARN("failed to get value from left child", strrc(rc));
+            return rc;
+        }
+        if (OB_FAIL(rc = right_cast_expr->try_get_value(right_val))) {
+            LOG_WARN("failed to get value from right child", strrc(rc));
+            return rc;
+        }
+        
+        left = make_unique<ValueExpr>(left_val);
+        right = make_unique<ValueExpr>(right_val);
+      } else if (left_to_right_cost <= right_to_left_cost && left_to_right_cost != INT32_MAX) {
         ExprType left_type = left->type();
         auto cast_expr = make_unique<CastExpr>(std::move(left), right->value_type());
         if (left_type == ExprType::VALUE) {
