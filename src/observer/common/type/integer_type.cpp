@@ -80,6 +80,11 @@ RC IntegerType::cast_to(const Value &val, AttrType type, Value &result) const {
       result.set_float((float)val.get_int());
     } break;
 
+    case AttrType::CHARS: {
+      char *buffer = new char[64];
+      int nbytes = sprintf(buffer, "%d", val.get_int());
+      result.set_string(buffer, nbytes);
+    } break;
     default: return RC::UNIMPLEMENTED;
   };
 

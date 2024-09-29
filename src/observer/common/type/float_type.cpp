@@ -91,6 +91,12 @@ RC FloatType::cast_to(const Value &val, AttrType type, Value &result) const {
       result.set_int((int)std::round(val.get_float()));
     } break;
 
+    case AttrType::CHARS: {
+      char *buffer = new char[64];
+      int nbytes = sprintf(buffer, "%g", val.get_float());
+      result.set_string(buffer, nbytes);
+    } break;
+
     default: return RC::UNIMPLEMENTED;
   }
   return RC::SUCCESS;
