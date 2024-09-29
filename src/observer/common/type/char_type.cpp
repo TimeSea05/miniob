@@ -29,6 +29,16 @@ RC CharType::set_value_from_str(Value &val, const string &data) const
 RC CharType::cast_to(const Value &val, AttrType type, Value &result) const
 {
   switch (type) {
+    case AttrType::INTS: {
+      int n = (int)strtol(val.data(), nullptr, 10);
+      result.set_int(n);
+    } break;
+
+    case AttrType::FLOATS: {
+      float n = strtof(val.data(), nullptr);
+      result.set_float(n);
+    } break;
+
     default: return RC::UNIMPLEMENTED;
   }
   return RC::SUCCESS;
@@ -36,10 +46,16 @@ RC CharType::cast_to(const Value &val, AttrType type, Value &result) const
 
 int CharType::cast_cost(AttrType type)
 {
-  if (type == AttrType::CHARS) {
-    return 0;
+  switch (type) {
+    case AttrType::CHARS:
+      return 0;
+    case AttrType::FLOATS:
+      return CastCost::CHARS_TO_FLOAT;
+    case AttrType::INTS:
+      return CastCost::CHARS_TO_INT;
+    default:
+      return INT32_MAX;
   }
-  return INT32_MAX;
 }
 
 RC CharType::to_string(const Value &val, string &result) const

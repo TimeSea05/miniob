@@ -18,6 +18,17 @@ See the Mulan PSL v2 for more details. */
 
 class Value;
 
+enum CastCost {
+  INT_TO_FLOAT = 1,
+  FLOAT_TO_INT = 2,
+
+  CHARS_TO_FLOAT = 1,
+  FLOAT_TO_CHARS = 2,
+
+  CHARS_TO_INT = 1,
+  INT_TO_CHARS = 2
+};
+
 /**
  * @brief 定义了数据类型相关的操作，比如比较运算、算术运算等
  * @defgroup 数据类型

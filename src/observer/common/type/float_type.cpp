@@ -15,6 +15,7 @@ See the Mulan PSL v2 for more details. */
 #include "common/value.h"
 #include "common/lang/limits.h"
 #include "common/value.h"
+#include <cmath>
 
 int FloatType::compare(const Value &left, const Value &right) const
 {
@@ -82,4 +83,28 @@ RC FloatType::to_string(const Value &val, string &result) const
   ss << common::double_to_str(val.value_.float_value_);
   result = ss.str();
   return RC::SUCCESS;
+}
+
+RC FloatType::cast_to(const Value &val, AttrType type, Value &result) const {
+  switch (type) {
+    case AttrType::INTS: {
+      result.set_int((int)std::round(val.get_float()));
+    } break;
+
+    default: return RC::UNIMPLEMENTED;
+  }
+  return RC::SUCCESS;
+}
+
+int FloatType::cast_cost(AttrType type) {
+  switch (type) {
+    case AttrType::FLOATS:
+      return 0;
+    case AttrType::INTS:
+      return CastCost::FLOAT_TO_INT;
+    case AttrType::CHARS:
+      return CastCost::FLOAT_TO_CHARS;
+    default:
+      return INT32_MAX;
+  }
 }
