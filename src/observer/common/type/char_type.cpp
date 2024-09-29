@@ -12,6 +12,7 @@ See the Mulan PSL v2 for more details. */
 #include "common/log/log.h"
 #include "common/type/char_type.h"
 #include "common/value.h"
+#include <cmath>
 
 int CharType::compare(const Value &left, const Value &right) const
 {
@@ -30,7 +31,7 @@ RC CharType::cast_to(const Value &val, AttrType type, Value &result) const
 {
   switch (type) {
     case AttrType::INTS: {
-      int n = (int)strtol(val.data(), nullptr, 10);
+      int n = std::round(strtof(val.data(), nullptr));
       result.set_int(n);
     } break;
 
